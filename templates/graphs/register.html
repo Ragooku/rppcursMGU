@@ -1,13 +1,125 @@
 {% extends 'graphs/base.html' %}
 
 {% block content %}
-<div class="auth-form">
-    <h2>Регистрация</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn">Зарегистрироваться</button>
-    </form>
-    <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        background-color: #f5f5f5;
+    }
+
+    .auth-form {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 450px;
+        margin: 2rem;
+    }
+
+    .auth-form h2 {
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+    }
+
+    .auth-form form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+
+    .auth-form .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .auth-form label {
+        font-weight: 500;
+        color: #34495e;
+    }
+
+    .auth-form input {
+        padding: 0.8rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .auth-form input:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .auth-form .btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 0.5rem;
+    }
+
+    .auth-form .btn:hover {
+        background-color: #2980b9;
+    }
+
+    .auth-form p {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #7f8c8d;
+    }
+
+    .auth-form a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auth-form a:hover {
+        text-decoration: underline;
+    }
+
+    /* Стили для ошибок */
+    .auth-form .errorlist {
+        color: #e74c3c;
+        margin-top: 0.2rem;
+        font-size: 0.9rem;
+        list-style: none;
+        padding-left: 0;
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-form">
+        <h2>Регистрация</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn">Зарегистрироваться</button>
+        </form>
+        <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+    </div>
 </div>
 {% endblock %}
