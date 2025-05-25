@@ -1,0 +1,91 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px; /* сохранён исходный размер */
+    border: none;
+    border-radius: 22px; /* скругление как в предыдущем варианте */
+    text-decoration: none;
+    color: white;
+    background: #7B3AED; /* фиолетовый */
+    box-shadow: 0 5px 0 #5D28B5; /* тень */
+    cursor: pointer;
+    font-size: 16px; /* размер текста */
+    transition: background 0.2s, box-shadow 0.2s, top 0.2s; /* плавные эффекты */
+}
+
+.btn:hover {
+    background: #5D28B5; /* тёмно-фиолетовый при наведении */
+    box-shadow: none;
+    position: relative;
+    top: 5px; /* эффект "нажатия" */
+}
+
+/* Добавьте этот стиль в ваш файл create.css */
+.btn-cancel {
+    display: inline-block;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 22px;
+    text-decoration: none;
+    color: white;
+    background: #EF4444; /* красный цвет */
+    box-shadow: 0 5px 0 #B91C1C; /* тень */
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s, box-shadow 0.2s, top 0.2s;
+    margin-left: 10px; /* отступ от основной кнопки */
+}
+
+.btn-cancel:hover {
+    background: #B91C1C; /* темно-красный при наведении */
+    box-shadow: none;
+    position: relative;
+    top: 5px;
+}
+
+.preview-container {
+    margin-top: 30px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+#preview-canvas {
+    max-width: 100%;
+    margin-top: 10px;
+}
+
+#columns-container {
+    margin-top: 15px;
+}
+
+.column-input {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}

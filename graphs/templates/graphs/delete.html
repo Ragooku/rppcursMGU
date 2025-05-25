@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Удалить график</title>
+    <title>Удалить</title>
 </head>
 <body>
-    <h1>Удалить график</h1>
-    <p>Вы уверены, что хотите удалить график "{{ graph.title }}"?</p>
+    <h1>Удалить</h1>
+    <p>Вы уверены, что хотите удалить диаграмму "{{ graph.title }}"?</p>
     <form method="post">
         {% csrf_token %}
         <button type="submit">Удалить</button>
