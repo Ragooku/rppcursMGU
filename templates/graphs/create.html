@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать новую диаграмму</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .preview-container {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        #preview-canvas {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+        #columns-container {
+            margin-top: 15px;
+        }
+        .column-input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Создать новую столбчатую диаграмму</h1>
+
+    <form method="post" id="graph-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="title">Название диаграммы:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+
+        <div class="form-group">
+            <label for="column-count">Количество столбцов:</label>
+            <input type="number" id="column-count" name="column_count" min="1" max="20" value="3" onchange="generateColumnInputs()">
+        </div>
+
+        <div id="columns-container">
+            <!-- Здесь будут динамически создаваться поля для ввода данных столбцов -->
+        </div>
+
+        <button type="submit" class="btn">Создать диаграмму</button>
+        <a href="{% url 'graph_list' %}" style="margin-left: 10px;">Отмена</a>
+    </form>
+
+    <div class="preview-container">
+        <h3>Предпросмотр диаграммы</h3>
+        <canvas id="preview-canvas" width="500" height="300"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Инициализация полей для столбцов
+        generateColumnInputs();
+    });
+
+    function generateColumnInputs() {
+        const columnCount = parseInt(document.getElementById('column-count').value);
+        const container = document.getElementById('columns-container');
+        container.innerHTML = '';
+
+        for (let i = 0; i < columnCount; i++) {
+            const columnDiv = document.createElement('div');
+            columnDiv.className = 'column-input';
+
+            const nameLabel = document.createElement('label');
+            nameLabel.textContent = `Название столбца ${i+1}:`;
+
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.name = `column_name_${i}`;
+            nameInput.placeholder = `Столбец ${i+1}`;
+            nameInput.required = true;
+
+            const valueLabel = document.createElement('label');
+            valueLabel.textContent = `Значение столбца ${i+1}:`;
+            valueLabel.style.marginTop = '10px';
+
+            const valueInput = document.createElement('input');
+            valueInput.type = 'number';
+            valueInput.name = `column_value_${i}`;
+            valueInput.placeholder = '0';
+            valueInput.required = true;
+
+            columnDiv.appendChild(nameLabel);
+            columnDiv.appendChild(nameInput);
+            columnDiv.appendChild(valueLabel);
+            columnDiv.appendChild(valueInput);
+
+            container.appendChild(columnDiv);
+        }
+
+        updatePreview();
+    }
+
+    function updatePreview() {
+        const container = document.getElementById('columns-container');
+        const columnInputs = container.getElementsByClassName('column-input');
+
+        const labels = [];
+        const values = [];
+
+        for (let i = 0; i < columnInputs.length; i++) {
+            const nameInput = columnInputs[i].querySelector('input[type="text"]');
+            const valueInput = columnInputs[i].querySelector('input[type="number"]');
+
+            labels.push(nameInput ? nameInput.value || `Столбец ${i+1}` : `Столбец ${i+1}`);
+            values.push(valueInput ? parseFloat(valueInput.value) || 0 : 0);
+        }
+
+        const ctx = document.getElementById('preview-canvas').getContext('2d');
+
+        if (window.chart) {
+            window.chart.destroy();
+        }
+
+        window.chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Значения',
+                    data: values,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Обновляем предпросмотр при изменении данных
+    document.addEventListener('input', function(e) {
+        if (e.target.name.includes('column_name_') || e.target.name.includes('column_value_')) {
+            updatePreview();
+        }
+    });
+    </script>
+</body>
+</html>

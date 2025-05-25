@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+{% extends 'graphs/base.html' %}
+
+{% block content %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Столбчатые диаграммы</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .graph-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 30px;
+        }
+        .graph-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .graph-card img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .btn-danger {
+            background-color: #f44336;
+        }
+        .empty-message {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin: 50px 0;
+        }
+        .data-preview {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Столбчатые диаграммы</h1>
+        {% if user.is_authenticated and user.user_type in 'admin,registered' %}
+            <a href="{% url 'create_graph' %}" class="btn">Создать новую диаграмму</a>
+        {% endif %}
+    </div>
+
+    <div class="graph-list">
+        {% for graph in graphs %}
+            <div class="graph-card">
+                <h3>{{ graph.title }}</h3>
+                <img src="{{ graph.graph_image.url }}" alt="Столбчатая диаграмма {{ graph.title }}">
+
+                <div class="data-preview">
+                    <p><strong>Данные:</strong></p>
+                    <ul>
+                        {% with data=graph.get_data %}
+                            {% for name, value in data.items %}
+                                <li>{{ name }}: {{ value }}</li>
+                            {% endfor %}
+                        {% endwith %}
+                    </ul>
+                </div>
+
+                <p><strong>Автор:</strong> {{ graph.user.username }}</p>
+                <p><strong>Дата:</strong> {{ graph.created_at|date:"d.m.Y H:i" }}</p>
+
+                {% if user.is_authenticated and user.user_type == 'admin' %}
+                    <form action="{% url 'delete_graph' graph.pk %}" method="post" style="margin-top: 10px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="empty-message">
+                <p>Пока нет ни одной диаграммы. {% if user.is_authenticated and user.user_type == 'registered' %}Создайте первую!{% endif %}</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
+{% endblock %}
