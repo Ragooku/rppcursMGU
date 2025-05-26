@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import Http404
 from .models import Graph, CustomUser
 from .forms import GraphForm
-import matplotlib.pyplot as plt
-import numpy as np
-from io import BytesIO
-from django.core.files.base import ContentFile
 from django.contrib.auth import login, authenticate, logout
 from .forms import RegisterForm, LoginForm
 
@@ -28,7 +26,6 @@ def create_graph(request):
     if request.method == 'POST':
         form = GraphForm(request.POST)
         if form.is_valid():
-            # Собираем данные столбцов из формы
             column_data = {}
             for key in request.POST:
                 if key.startswith('column_name_'):
@@ -41,7 +38,7 @@ def create_graph(request):
             if column_data:
                 graph = form.save(commit=False)
                 graph.user = request.user
-                graph.data = column_data  # Сохраняем данные столбцов
+                graph.data = column_data
                 graph.save()
                 return redirect('graph_list')
     else:
@@ -50,12 +47,20 @@ def create_graph(request):
 
 
 @login_required
-@user_passes_test(is_admin)
 def delete_graph(request, pk):
+    """
+    Удаление графика (только для автора или админа)
+    """
     graph = get_object_or_404(Graph, pk=pk)
+
+    if not (request.user.user_type == 'admin' or request.user == graph.user):
+        raise Http404("У вас нет прав для удаления этого графика")
+
     if request.method == 'POST':
         graph.delete()
+        messages.success(request, 'График успешно удален!')
         return redirect('graph_list')
+
     return render(request, 'graphs/delete.html', {'graph': graph})
 
 
