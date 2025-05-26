@@ -25,7 +25,11 @@
             margin-left: 30px;
             padding-right: 20px;
         }
-
+        graph-container {
+        position: relative;
+        width: 100%;
+        height: 300px; /* Фиксированная высота */
+    }
         .graph-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
@@ -37,52 +41,51 @@
             padding: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .graph-card img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 10px 0;
-        }
+        .graph-canvas {
+        width: 100% !important;  /* Ширина на весь контейнер */
+        height: 250px !important; /* Фиксированная высота */
+        min-height: 250px; /* Минимальная высота */
+        margin: 15px 0;
+    }
       .btn {
-    border: none;
-    border-radius: 22px;
-    text-decoration: none;
-    color: white;
-    background: #7B3AED; /* фиолетовый основной цвет */
-    box-shadow: 0 5px 0 #5D28B5; /* тёмно-фиолетовый для тени */
-    padding: 10px 24px;
-    font-size: 16px;
-    display: inline-block;
-    transition: background 0.2s, box-shadow 0.2s, top 0.2s; /* плавные переходы */
-    margin-right: 25px; /* Это перенесет кнопку влево */
-}
-
-.btn:hover {
-    background: #5D28B5; /* тёмно-фиолетовый при наведении */
-    box-shadow: none;
-    position: relative;
-    top: 5px;
-}
-        .empty-message {
-            text-align: center;
-            font-size: 18px;
-            color: #666;
-            margin: 50px 0;
-            grid-column: 1 / -1; /* Это заставит сообщение занимать всю ширину grid-контейнера */
-            width: 100%;
-        }
-        .data-preview {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #555;
-        }
-        .btn-danger {
-            background: #e74c3c;
-            box-shadow: 0 5px 0 #c0392b;
-        }
-        .btn-danger:hover {
-            background: #c0392b;
-        }
+        border: none;
+        border-radius: 22px;
+        text-decoration: none;
+        color: white;
+        background: #7B3AED;
+        box-shadow: 0 5px 0 #5D28B5;
+        padding: 10px 24px;
+        font-size: 16px;
+        display: inline-block;
+        transition: background 0.2s, box-shadow 0.2s, top 0.2s;
+        margin-right: 25px;
+      }
+      .btn:hover {
+        background: #5D28B5;
+        box-shadow: none;
+        position: relative;
+        top: 5px;
+      }
+      .empty-message {
+        text-align: center;
+        font-size: 18px;
+        color: #666;
+        margin: 50px 0;
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+      .data-preview {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #555;
+      }
+      .btn-danger {
+        background: #e74c3c;
+        box-shadow: 0 5px 0 #c0392b;
+      }
+      .btn-danger:hover {
+        background: #c0392b;
+      }
     </style>
 </head>
 <body>
@@ -97,7 +100,7 @@
         {% for graph in graphs %}
             <div class="graph-card">
                 <h3>{{ graph.title }}</h3>
-                <img src="{{ graph.graph_image.url }}" alt="Столбчатая диаграмма {{ graph.title }}">
+                <canvas class="graph-canvas" id="graph-{{ graph.id }}"></canvas>
 
                 <div class="data-preview">
                     <p><strong>Данные:</strong></p>
@@ -127,19 +130,48 @@
         {% endfor %}
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Обработка удаления графиков
             const deleteForms = document.querySelectorAll('.delete-form');
-
             deleteForms.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-
                     if (confirm('Вы уверены, что хотите удалить этот график? Это действие нельзя отменить.')) {
                         this.submit();
                     }
                 });
             });
+
+            // Отрисовка всех графиков
+            {% for graph in graphs %}
+                const ctx{{ graph.id }} = document.getElementById('graph-{{ graph.id }}').getContext('2d');
+                const data{{ graph.id }} = {{ graph.data|safe }};
+
+                new Chart(ctx{{ graph.id }}, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data{{ graph.id }}),
+                        datasets: [{
+                            label: 'Значения',
+                            data: Object.values(data{{ graph.id }}),
+                            backgroundColor: 'rgba(123, 58, 237, 0.6)',
+                            borderColor: 'rgba(93, 40, 181, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            {% endfor %}
         });
     </script>
 </body>
