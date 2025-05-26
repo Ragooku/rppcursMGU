@@ -7,17 +7,36 @@
         justify-content: center;
         align-items: center;
         min-height: 80vh;
-        background-color: #f5f5f5;
+        /* Фоновое изображение - замените url на путь к вашему изображению */
+        background-image: url('/static/assets/blog-header.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        /* Затемнение фона для лучшей читаемости формы */
+        position: relative;
+    }
+
+    /* Затемнение фона */
+    .auth-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.4);
     }
 
     .auth-form {
-        background: white;
+        background: rgba(255, 255, 255, 0.95); /* Полупрозрачный белый фон */
         padding: 2.5rem;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         width: 100%;
         max-width: 450px;
         margin: 2rem;
+        position: relative; /* Для правильного позиционирования поверх затемнения */
+        z-index: 1; /* Чтобы форма была поверх затемнения */
     }
 
     .auth-form h2 {
@@ -50,16 +69,18 @@
         border-radius: 8px;
         font-size: 1rem;
         transition: all 0.3s ease;
+        background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный фон для полей ввода */
     }
 
     .auth-form input:focus {
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        border-color: #7e22ce;
+        box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.2);
         outline: none;
+        background-color: white; /* При фокусе делаем полностью белым */
     }
 
     .auth-form .btn {
-        background-color: #3498db;
+        background-color: #7e22ce;
         color: white;
         border: none;
         padding: 1rem;
@@ -72,7 +93,7 @@
     }
 
     .auth-form .btn:hover {
-        background-color: #2980b9;
+        background-color: #6b21a8;
     }
 
     .auth-form p {
@@ -82,12 +103,13 @@
     }
 
     .auth-form a {
-        color: #3498db;
+        color: #7e22ce;
         text-decoration: none;
         font-weight: 500;
     }
 
     .auth-form a:hover {
+        color: #6b21a8;
         text-decoration: underline;
     }
 
